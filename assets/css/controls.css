@@ -1,0 +1,325 @@
+/* Keep all three header controls at the same height; adjust only this value. */
+:root { --header-control-height: 40px; --card-gap: 12px; --space-section: var(--card-gap); }
+/* One screen owns navigation; only its content scrolls, never the document. */
+html, body { height:100%; min-height:0; overflow:hidden; overscroll-behavior:none; }
+.app-shell { position:fixed; inset:0; overflow:hidden; }
+.app-shell > .app-wrapper { position:absolute; inset:0; overflow-x:hidden; overflow-y:auto; scrollbar-width:none; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; }
+.app-shell > .app-wrapper::-webkit-scrollbar { display:none; }
+.app-shell > .app-wrapper.app-scroll-locked { overflow:hidden; }
+.login-screen .app-shell { visibility:hidden; }
+#bottomTabBar {
+  /* Root-level dock: content sizing and viewport measurements cannot lift it. */
+  position: fixed;
+  top: auto;
+  left:0;
+  right:0;
+  width:calc(100% - var(--layout-gutter) * 2);
+  max-width:var(--layout-width);
+  bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+  margin-inline:auto;
+  margin-block: 0;
+}
+/* Closed overlays must also disappear from keyboard and screen-reader navigation. */
+.modal-overlay, .umkd-file-overlay { visibility:hidden; transition:opacity .22s ease,visibility 0s linear .22s; }
+.modal-overlay.active, .umkd-file-overlay.active { visibility:visible; transition-delay:0s; }
+.content-loading { display:grid; place-items:center; min-height:160px; color:var(--accent); }
+.content-loading svg { display:block; width:38px; height:38px; }
+.content-loading-track { opacity:.16; }
+.content-loading-arrow { transform-box:view-box; transform-origin:16px 16px; animation:contentLoadingTurn 1.1s linear infinite; }
+.content-loading-compact { display:inline-grid; min-height:0; vertical-align:middle; }
+.content-loading-compact svg { width:18px; height:18px; }
+@keyframes contentLoadingTurn { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce) { .content-loading-arrow { animation:none; } }
+.exam-when { color:var(--accent); font-size:13px; font-weight:700; line-height:1.5; overflow-wrap:anywhere; }
+.exam-title { margin:8px 0; font-size:18px; line-height:1.45; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.exam-card .row-meta { margin:0; overflow-wrap:anywhere; }
+/* Keep its layout rectangle for chat sizing while the software keyboard is open. */
+.chat-keyboard-open #bottomTabBar,
+.chat-keyboard-open .tab-scroll-fade { visibility:hidden; pointer-events:none; }
+/* A keyboard-open thread is independent of the page's scroll and entrance transforms. */
+.chat-keyboard-open #sectionChat, .chat-keyboard-open #chatThread { animation:none; transform:none; }
+.chat-keyboard-open .app-shell > .app-wrapper { overflow:hidden; }
+.chat-keyboard-open #chatThread {
+  position:fixed;
+  top:var(--chat-viewport-top, 0px);
+  bottom:auto;
+  left:0;
+  right:0;
+  width:calc(100% - var(--layout-gutter) * 2);
+  max-width:var(--layout-width);
+  height:var(--chat-viewport-height);
+  min-height:0;
+  margin:0 auto;
+  padding-top:calc(8px + max(env(safe-area-inset-top, 0px), var(--tg-safe-area-top)) + var(--tg-content-safe-area-top));
+  z-index:501;
+}
+.ios-native-viewport .chat-keyboard-open #chatThread { padding-top:8px; }
+.login-remember{position:relative;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:44px;margin:0 0 10px;color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.login-remember input{position:absolute;right:0;width:44px;height:44px;margin:0;opacity:0;cursor:pointer}
+.login-remember-switch{display:block;flex:0 0 42px;height:26px;padding:3px;border:1px solid var(--line);border-radius:20px;background:var(--paper-2);pointer-events:none;transition:background .18s,border-color .18s}
+.login-remember-switch::after{content:"";display:block;width:18px;height:18px;border-radius:50%;background:var(--ink-soft);transition:transform .18s,background .18s}
+.login-remember input:checked+.login-remember-switch{background:var(--accent);border-color:var(--accent)}
+.login-remember input:checked+.login-remember-switch::after{transform:translateX(16px);background:var(--accent-text)}
+.login-remember input:focus-visible+.login-remember-switch{outline:2px solid var(--accent);outline-offset:4px}
+@media(prefers-reduced-motion:reduce){.login-remember-switch,.login-remember-switch::after{transition:none}}
+/* Paint the transparent iOS status area with the current theme, without a blur. */
+.standalone-app::before { content:""; position:fixed; top:0; left:0; right:0; height:env(safe-area-inset-top,0px); background:var(--system-bar-bg,var(--paper)); pointer-events:none; z-index:1001; }
+/* iOS already reserves these regions in native viewport mode; do not add them twice. */
+.ios-native-viewport::before { display:none; }
+.ios-native-viewport .app-shell > .app-wrapper { padding-top:14px; padding-bottom:132px; }
+.ios-native-viewport #bottomTabBar { bottom:8px; }
+.ios-native-viewport .tab-scroll-fade { height:114px; }
+/* Keep foreground controls crisp; background softness belongs to its own layer. */
+#sectionSchedule :is(.status-bar, .header-right-top, .today-btn, .appearance-toggle, .theme-btn, .weather-widget),
+.chat-thread-header, .chat-page-header {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.header-right-top > :is(.today-btn, .appearance-toggle, .theme-btn) {
+  box-sizing: border-box;
+  height: var(--header-control-height);
+  min-height: var(--header-control-height);
+  max-height: var(--header-control-height);
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+}
+.header-right-top > :is(.appearance-toggle, .theme-btn) {
+  width: var(--header-control-height);
+  min-width: var(--header-control-height);
+  padding: 9px;
+}
+.header-right-top > .today-btn {
+  width: auto;
+  padding: 0 9px;
+  line-height: 1;
+}
+
+/* Compact schedule header: title and controls, then lesson status and weather. */
+#sectionSchedule .status-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: var(--card-gap);
+  padding-bottom: 0;
+}
+#sectionSchedule :is(.status-info-left, .header-right-block) { display: contents; }
+#sectionSchedule #weekStatusText { grid-column: 1; grid-row: 1; min-width: 0; }
+#sectionSchedule #weekStatusText .masthead-eyebrow { display: none; }
+#sectionSchedule .masthead-headline {
+  font-size: clamp(20px, 5.5vw, 25px);
+  line-height: 1.2;
+  text-wrap: initial;
+  overflow-wrap: normal;
+}
+#sectionSchedule .header-right-top {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  justify-content: flex-end;
+  gap: 6px;
+}
+#sectionSchedule .live-lesson-badge {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+  margin-top: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+#sectionSchedule .live-lesson-badge > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+#sectionSchedule .weather-widget {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  max-width: 160px;
+  min-height: 24px;
+  padding: 3px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 12px;
+}
+#sectionSchedule { --schedule-control-height: 40px; }
+#sectionSchedule .week-stepper { margin-bottom: var(--card-gap); padding: 3px; }
+#sectionSchedule .week-step-btn { width: 40px; }
+#sectionSchedule .week-step-label { font-size: 14px; }
+#sectionSchedule .days-grid { margin-top: 0; margin-bottom: var(--card-gap); padding: 3px; }
+#sectionSchedule :is(.week-step-btn, .day-btn) {
+  box-sizing: border-box;
+  height: var(--schedule-control-height);
+  min-height: var(--schedule-control-height);
+  max-height: var(--schedule-control-height);
+  padding-block: 0;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+/* Times sit outside the cards on a single continuous timeline. */
+#scheduleContainer .list-card { display: grid; gap: var(--card-gap); }
+#scheduleContainer .lesson-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+#scheduleContainer .lesson-event::before {
+  content: '';
+  position: absolute;
+  left: 63px;
+  top: 22px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  z-index: 1;
+}
+#scheduleContainer .lesson-event::after {
+  content: '';
+  position: absolute;
+  left: 65px;
+  top: 27px;
+  bottom: -34px;
+  width: 1px;
+  background: var(--line);
+}
+#scheduleContainer .lesson-event:last-child::after { display: none; }
+#scheduleContainer .lesson-event.is-current::before {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .12);
+}
+#scheduleContainer .list-row {
+  box-sizing: border-box;
+  height: auto;
+  min-width: 0;
+  padding: 12px 14px;
+  gap: 0;
+  margin-bottom: 0;
+  border-radius: 18px;
+  align-items: stretch;
+}
+#scheduleContainer .row-index {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  border: 0;
+  padding: 12px 0 0;
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+#scheduleContainer .row-index-main { font-size: 16px; font-weight: 700; line-height: 22px; }
+#scheduleContainer .row-index-sub { margin: 0; font-size: 12px; font-weight: 550; line-height: 18px; }
+#scheduleContainer .is-current .row-index-main { color: var(--accent); }
+#scheduleContainer .row-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0;
+}
+#scheduleContainer .row-top { display: block; min-width: 0; }
+#scheduleContainer .row-title { display: block; min-width: 0; font-size: 15px; font-weight: 700; line-height: 20px; }
+#scheduleContainer .lesson-subject-wrap { font-size: 15px; line-height: 20px; letter-spacing: -.01em; overflow-wrap: anywhere; }
+#scheduleContainer .lesson-kind-row { display: flex; align-items: center; gap: 7px; min-height: 21px; margin: 5px 0 6px; }
+#scheduleContainer .lesson-type-name {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: rgba(var(--accent-rgb), .08);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+}
+#scheduleContainer .row-meta {
+  min-width: 0;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#scheduleContainer .row-meta + .row-meta { margin-top: 4px; }
+#scheduleContainer .live-tag { font-size: 10px; line-height: 17px; }
+#scheduleContainer .lesson-live-aura, #scheduleContainer .lesson-live-orbit { border-radius: 20px; }
+#scheduleContainer .lesson-progress-container {
+  position: static;
+  width: 100%;
+  margin: 8px 0 0;
+  flex-shrink: 0;
+  height: 2px;
+}
+@media (max-width: 360px) {
+  #scheduleContainer .lesson-event { grid-template-columns: 50px minmax(0, 1fr); gap: 18px; }
+  #scheduleContainer .lesson-event::before { left: 56px; }
+  #scheduleContainer .lesson-event::after { left: 58px; }
+  #scheduleContainer .list-row { padding-inline: 12px; }
+  #scheduleContainer .row-index-main { font-size: 15px; }
+  #scheduleContainer .lesson-kind-row { gap: 5px; }
+}
+
+/* One spacing rhythm for screen cards; internal text spacing stays compact. */
+#profileContainer { display:grid; gap:var(--card-gap); min-width:0; }
+#profileContainer > * { min-width:0; margin:0; }
+#profileContainer .profile-study-tiles { gap:var(--card-gap); }
+#profileContainer .profile-update-status:empty { display:none; }
+#profileContainer .profile-update-status { color:var(--text-secondary); }
+.profile-update-available { display:flex; align-items:center; gap:8px; margin-top:14px; color:var(--ink); font-size:13px; font-weight:650; line-height:1.5; }
+.profile-update-available[hidden] { display:none; }
+.profile-update-dot { width:8px; height:8px; flex:0 0 8px; border-radius:50%; background:#ef4444; }
+.profile-update-badge { position:absolute; top:-3px; right:-5px; z-index:3; width:10px; height:10px; border:2px solid var(--paper-2); border-radius:50%; background:#ef4444; pointer-events:none; }
+.profile-update-badge[hidden] { display:none; }
+.profile-update-available:not([hidden]) + .profile-update-btn { margin-top:8px; }
+.grade-card, .grade-card:not(:last-child), .gpa-card, .notice-panel { margin-bottom:var(--card-gap); }
+#gradesContainer > .grade-card:last-child { margin-bottom:0; }
+.chat-peer-profile-hero, .chat-page-header, .chat-status { margin-bottom:var(--card-gap); }
+.profile-back, .navigation-back { margin-bottom:var(--card-gap); }
+.grade-title { display:block; min-width:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; overflow-wrap:normal; }
+.grade-summary { display:block; list-style:none; cursor:pointer; border-radius:10px; }
+.grade-summary::-webkit-details-marker { display:none; }
+.grade-summary::marker { content:''; }
+.grade-summary:focus-visible { outline:2px solid var(--accent); outline-offset:6px; }
+.grade-details-link { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; color:var(--accent); font-size:13px; font-weight:700; }
+.grade-card[open] .profile-gpa-arrow { transform:rotate(90deg); }
+.grade-details-body { border-top:1px solid var(--glass-border); margin-top:16px; padding-top:16px; }
+.grade-points-group { min-width:0; }
+.grade-points-group + .grade-points-group { margin-top:14px; padding-top:14px; border-top:1px solid var(--glass-border); }
+.grade-points-group h3 { font-size:13px; line-height:1.5; margin:0; overflow-wrap:anywhere; }
+.grade-points-tutor { margin:3px 0 10px; font-size:12px; line-height:1.5; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.grade-points-scroll { max-width:100%; min-width:0; overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain; margin-top:10px; scrollbar-width:thin; scrollbar-color:var(--glass-border) transparent; }
+.grade-points-scroll:focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:8px; }
+.grade-points-table { table-layout:fixed; width:100%; min-width:calc(48px + var(--grade-column-count, 1) * 56px); border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.grade-points-table th, .grade-points-table td { padding:7px 3px; text-align:center; border-bottom:1px solid var(--glass-border); }
+.grade-points-table th { color:var(--ink-soft); font-size:11px; font-weight:500; }
+.grade-points-table th:first-child { width:42px; padding-left:0; text-align:left; }
+.grade-points-table time { display:block; white-space:nowrap; font-size:12px; }
+.grade-points-table time small { display:block; font-size:10px; opacity:.65; margin-top:2px; }
+.grade-point-mark { display:inline-flex; box-sizing:border-box; justify-content:center; width:100%; max-width:54px; padding:7px 2px; border-radius:10px; color:var(--accent); background:var(--paper); font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; }
+.grade-points-empty, .grade-points-error { margin:0; color:var(--ink-soft); font-size:13px; line-height:1.6; }
+.grade-points-retry { margin-top:8px; padding:8px 12px; border:1px solid var(--glass-border); border-radius:12px; background:var(--paper-2); color:var(--accent); font:inherit; cursor:pointer; }
+.push-preferences { margin-block:var(--card-gap); padding:16px; border:1px solid var(--glass-border); border-radius:24px; background:var(--paper-2); }
+.push-preferences h2 { margin:0 0 6px; font-size:16px; }
+.push-setting { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0; border-bottom:1px solid var(--glass-border); font-size:14px; cursor:pointer; }
+.push-setting span { min-width:0; }
+.push-setting small { display:block; margin-top:4px; font-size:12px; line-height:1.5; color:var(--ink-soft); }
+.push-setting input { appearance:none; flex:0 0 42px; width:42px; height:26px; margin:0; border:1px solid var(--glass-border); border-radius:99px; background:var(--line); cursor:pointer; position:relative; transition:background .18s; }
+.push-setting input::before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; border-radius:50%; background:var(--ink-soft); transition:transform .18s; }
+.push-setting input:checked { background:var(--accent); border-color:var(--accent); }
+.push-setting input:checked::before { transform:translateX(16px); background:var(--accent-text); }
+.push-setting input:disabled { opacity:.45; cursor:default; }
+.push-setting input:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+.push-status { margin:12px 0 0; font-size:12px; line-height:1.5; color:var(--ink-soft); }
+.push-retry { min-height:42px; margin-top:10px; padding:8px 12px; border:1px solid var(--glass-border); border-radius:12px; background:transparent; color:var(--accent); font:inherit; font-size:12px; cursor:pointer; }
+.push-retry[hidden] { display:none; }
+@media(prefers-reduced-motion:reduce) { .push-setting input,.push-setting input::before {transition:none;} }

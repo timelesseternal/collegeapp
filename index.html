@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>UniLink · ШИ-9-23</title>
+  <meta name="unilink-version" content="shi-9-23-v1">
+  <meta name="description" content="Расписание пар и звонков группы ШИ-9-23 (4 курс)">
+  <meta name="color-scheme" content="light dark">
+
+  <meta name="theme-color" content="#F2F2F7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="UniLink">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/unilink-dark-apple-touch.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/unilink-dark-favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/unilink-dark-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <link rel="preload" href="./assets/fonts/manrope/cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/manrope/cyrillic-ext.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/manrope/latin.woff2" as="font" type="font/woff2" crossorigin>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./assets/js/appearance.js"></script>
+
+  <link rel="stylesheet" href="./assets/css/app.css">
+  <link rel="stylesheet" href="./assets/css/background.css">
+  <link rel="stylesheet" href="./assets/css/typography.css">
+  <link rel="stylesheet" href="./assets/css/motion.css">
+  <link rel="stylesheet" href="./assets/css/controls.css">
+  <link rel="stylesheet" href="./assets/css/schedule-share.css">
+  <style>
+    .bottom-tab-bar.single-tab-bar {
+      max-width: 220px;
+      margin-inline: auto;
+    }
+    .bells-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 12px 0 18px;
+      text-align: left;
+    }
+    .bells-card {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      background: var(--paper);
+    }
+    .bells-card-title {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .bells-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      font-size: 14px;
+      border-bottom: 1px solid var(--line);
+      font-variant-numeric: tabular-nums;
+    }
+    .bells-row:last-child {
+      border-bottom: none;
+    }
+    .bells-row-num {
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+    .bells-row-time {
+      color: var(--ink);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<div class="aurora-backdrop" aria-hidden="true"><span class="aurora-grain"></span></div>
+
+<div class="modal-overlay" id="cityModal">
+  <div class="modal-card">
+    <div class="modal-title">Выбор города</div>
+    <input
+      type="text"
+      id="citySearchInput"
+      class="modal-select"
+      placeholder="Введите или выберите город…"
+      autocomplete="off"
+      data-city-filter
+    >
+    <div class="city-list" id="cityList"></div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" data-action="closeCityModal()">Отменить</button>
+      <button class="modal-btn save" data-action="saveCityAndLoad()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="accentModal">
+  <div class="modal-card">
+    <div class="modal-title">Акцентный цвет</div>
+    <div class="accent-swatch-grid" id="accentSwatchGrid"></div>
+    <button class="accent-default-btn" id="accentDefaultBtn" data-action="selectAccentSwatch('default')">
+      <span class="accent-default-check">✓</span>
+      <span>По умолчанию</span>
+    </button>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" data-action="closeAccentModal()">Отменить</button>
+      <button class="modal-btn save" data-action="saveAccentTheme()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bellsModal">
+  <div class="modal-card">
+    <div class="modal-title">Расписание звонков</div>
+    <div class="bells-grid">
+      <div class="bells-card">
+        <div class="bells-card-title">Понедельник — Четверг</div>
+        <div class="bells-row"><span class="bells-row-num">1 пара</span><span class="bells-row-time">08:00 – 09:20</span></div>
+        <div class="bells-row"><span class="bells-row-num">2 пара</span><span class="bells-row-time">09:30 – 10:50</span></div>
+        <div class="bells-row"><span class="bells-row-num">3 пара</span><span class="bells-row-time">11:05 – 12:25</span></div>
+        <div class="bells-row"><span class="bells-row-num">4 пара</span><span class="bells-row-time">12:35 – 13:55</span></div>
+        <div class="bells-row"><span class="bells-row-num">5 пара</span><span class="bells-row-time">14:05 – 15:25</span></div>
+      </div>
+      <div class="bells-card">
+        <div class="bells-card-title">Пятница</div>
+        <div class="bells-row"><span class="bells-row-num">0 пара</span><span class="bells-row-time">08:00 – 08:40</span></div>
+        <div class="bells-row"><span class="bells-row-num">1 пара</span><span class="bells-row-time">08:50 – 10:10</span></div>
+        <div class="bells-row"><span class="bells-row-num">2 пара</span><span class="bells-row-time">10:20 – 11:40</span></div>
+        <div class="bells-row"><span class="bells-row-num">3 пара</span><span class="bells-row-time">11:55 – 13:15</span></div>
+        <div class="bells-row"><span class="bells-row-num">4 пара</span><span class="bells-row-time">13:25 – 14:45</span></div>
+      </div>
+    </div>
+    <div class="modal-buttons">
+      <button class="modal-btn save" style="flex:1;" data-action="closeBellsModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="app-shell">
+<div class="app-wrapper">
+  <div class="container">
+
+    <div class="app-section" id="sectionSchedule">
+      <div class="status-bar">
+        <div class="status-info-left">
+          <span id="weekStatusText"><span class="masthead-eyebrow">Расписание · ШИ-9-23</span><span class="masthead-headline">—</span></span>
+          <span class="live-lesson-badge" id="liveLessonBadge"><span class="live-dot"></span><span>Идёт пара…</span></span>
+        </div>
+        <div class="header-right-block">
+          <div class="header-right-top">
+            <button class="today-btn" id="todayBtn" data-action="jumpToToday()" aria-label="Перейти к сегодняшнему дню">Сегодня</button>
+            <button class="theme-btn" id="bellsBtn" data-action="openBellsModal()" aria-label="Расписание звонков" title="Расписание звонков">
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </button>
+            <button type="button" class="appearance-toggle" data-action="toggleColorMode()" aria-label="Включить тёмную тему" aria-pressed="false">
+              <svg class="appearance-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.9 13.1A9 9 0 0 1 10.9 3.1a9 9 0 1 0 10 10Z"/></svg>
+              <svg class="appearance-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg>
+            </button>
+            <button class="theme-btn" id="themeBtn" data-action="openAccentModal()" aria-label="Выбрать акцентный цвет" title="Акцентный цвет">
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1.4-3.4 1.5 1.5 0 0 1 1.1-2.6H18a3 3 0 0 0 3-3 9 9 0 0 0-9-9Z"/><circle cx="7.5" cy="10" r=".7"/><circle cx="10" cy="6.5" r=".7"/><circle cx="14.5" cy="6.5" r=".7"/><circle cx="17" cy="10" r=".7"/></svg>
+            </button>
+          </div>
+          <button type="button" class="weather-widget" id="weatherWidget" data-action="openCityModal()" aria-label="Выбрать город для погоды">— · —°</button>
+        </div>
+      </div>
+
+      <div class="schedule-week-tools">
+        <div class="week-stepper" id="weekStepper">
+          <button class="week-step-btn" id="weekPrevBtn" data-action="stepWeek(-1)" aria-label="Предыдущая неделя"><svg aria-hidden="true" class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+          <span class="week-step-label" id="weekStepLabel" data-action="toggleWeekParity()" title="Нажмите, чтобы переключить Числитель / Знаменатель" style="cursor:pointer;">Неделя 1 · Числитель</span>
+          <button class="week-step-btn" id="weekNextBtn" data-action="stepWeek(1)" aria-label="Следующая неделя"><svg aria-hidden="true" class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+        <button type="button" class="schedule-share-launch" id="scheduleShareLaunch" aria-label="Поделиться расписанием"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m-4 4 4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
+      </div>
+
+      <div class="days-grid" id="daysGrid">
+        <div class="day-indicator" id="dayIndicator"></div>
+        <button class="day-btn" id="btn-ПН" data-action="selectDay('Понедельник', this)">ПН</button>
+        <button class="day-btn" id="btn-ВТ" data-action="selectDay('Вторник', this)">ВТ</button>
+        <button class="day-btn" id="btn-СР" data-action="selectDay('Среда', this)">СР</button>
+        <button class="day-btn" id="btn-ЧТ" data-action="selectDay('Четверг', this)">ЧТ</button>
+        <button class="day-btn" id="btn-ПТ" data-action="selectDay('Пятница', this)">ПТ</button>
+        <button class="day-btn" id="btn-СБ" data-action="selectDay('Суббота', this)">СБ</button>
+        <div class="weekend-badge" id="weekendBadge">Сегодня выходной</div>
+      </div>
+
+      <div id="scheduleContainer"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="tab-scroll-fade" aria-hidden="true"></div>
+<nav class="bottom-tab-bar single-tab-bar" id="bottomTabBar">
+  <div class="bottom-tab-indicator" id="tabIndicator"></div>
+  <button class="bottom-tab-btn active" id="section-schedule" data-action="tapTab('schedule')" aria-label="Расписание">
+    <div class="bottom-tab-icon-wrap">
+      <span aria-hidden="true" class="tab-refresh-icon" data-loading-icon></span>
+      <svg aria-hidden="true" class="bottom-tab-icon icon-outline" viewBox="0 0 24 24" fill="none" fill-opacity="1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4m8-4v4M4 10h16" fill="none"/></svg>
+      <svg aria-hidden="true" class="bottom-tab-icon icon-filled" viewBox="0 0 24 24" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4m8-4v4M4 10h16" fill="none"/></svg>
+    </div>
+    <span>Расписание</span>
+  </button>
+</nav>
+
+<script defer src="./assets/js/loading.js"></script>
+<script defer src="./assets/js/motion.js"></script>
+<script defer src="./assets/js/app.js"></script>
+<script defer src="./assets/js/schedule-share.js"></script>
+<script defer src="./assets/js/actions.js"></script>
+<script defer src="./assets/js/viewport-recovery.js"></script>
+<script defer src="./assets/js/navigation.js"></script>
+<script defer src="./assets/js/background.js"></script>
+</body>
+</html>
